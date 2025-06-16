@@ -5,33 +5,225 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+        * {
+            box-sizing: border-box;
         }
 
-        h1 {
-            color: #333;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        #navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px 30px;
+        }
+
+        #navbar h1 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        #navbar button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #navbar button:hover {
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 30px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .blog-form input,
+        .blog-form textarea {
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .blog-form button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .blog-form button:hover {
+            background-color: #2980b9;
+        }
+
+        .blog-post {
+            background-color: #fff;
+            margin-top: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 15px 20px;
+        }
+
+        .blog-post h2 {
+            margin: 0 0 10px;
+            font-size: 20px;
+            color: #2c3e50;
+        }
+
+        .blog-post p {
+            font-size: 15px;
+            color: #555;
+        }
+
+        .blog-post img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 12px;
+            border-radius: 6px;
+        }
+
+        .blog-post button {
+            margin-top: 12px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .blog-post button:hover {
+            background-color: #c0392b;
         }
     </style>
 </head>
 
 <body>
-    <h1 id="welcomeMessage"></h1>
+    <div id="navbar">
+        <h1 id="welcomeMessage"></h1>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <div class="container">
+        <div class="blog-form">
+            <input type="file" id="imageInput" accept="image/*"/>
+            <input type="text" id="titleInput" placeholder="Enter Title"/>
+            <textarea id="descriptionInput" rows="4" placeholder="Enter Description"></textarea>
+            <button onclick="submitPost()">Post</button>
+        </div>
+
+        <div id="blogContainer"></div>
+    </div>
 </body>
 
 </html>
 
 <script>
-    let user = JSON.parse(localStorage.getItem('currentUser'))
+    let user = JSON.parse(localStorage.getItem('currentUser'));
     if (!user) {
-        window.location.href = "signin.html"
+        window.location.href = "signin.html";
     } else {
-        welcomeMessage.innerHTML = `welcome ${user.name}`
+        welcomeMessage.innerHTML = `Welcome, ${user.name}`
     }
+
+    let userBlogKey = `blogs_${user.name}`
+
+    function getUserBlogs() {
+        return JSON.parse(localStorage.getItem(userBlogKey)) || [];
+    }
+
+    function saveUserBlogs(blogs) {
+        localStorage.setItem(userBlogKey, JSON.stringify(blogs));
+    }
+
+    function renderBlogs() {
+        let blogs = getUserBlogs()
+        let container = document.getElementById('blogContainer')
+        container.innerHTML = ''
+
+        blogs.forEach((blog, index) => {
+            container.innerHTML += `
+          <div class="blog-post">
+            <h2>${blog.title}</h2>
+            <p>${blog.description}</p>
+            <img src="${blog.image}" alt="Blog Image" />
+            <button onclick="deleteBlog(${index})">Delete</button>
+          </div>
+        `
+        });
+    }
+
+    function submitPost() {
+        let imageInput = document.getElementById('imageInput')
+        let title = document.getElementById('titleInput').value.trim()
+        let description = document.getElementById('descriptionInput').value.trim()
+
+        if (!title || !description || imageInput.files.length === 0) {
+            alert('All fields are required')
+            return
+        }
+
+        let blogs = getUserBlogs()
+        let duplicate = blogs.some(blog => blog.title.toLowerCase() === title.toLowerCase());
+        if (duplicate) {
+            alert('This blog title already exists')
+            return
+        }
+
+        let reader = new FileReader()
+        reader.onload = function (e) {
+            let newBlog = {
+                title,
+                description,
+                image: e.target.result
+            }
+
+            blogs.push(newBlog)
+            saveUserBlogs(blogs)
+            renderBlogs()
+
+           
+            imageInput.value = ''
+            document.getElementById('titleInput').value = ''
+            document.getElementById('descriptionInput').value = ''
+        }
+        reader.readAsDataURL(imageInput.files[0])
+    }
+
+    function deleteBlog(index) {
+        let blogs = getUserBlogs()
+        blogs.splice(index, 1)
+        saveUserBlogs(blogs)
+        renderBlogs()
+    }
+
+    function logout() {
+        localStorage.removeItem('currentUser')
+        window.location.href = "signin.html"
+    }
+
+    window.onload = renderBlogs
 </script>
