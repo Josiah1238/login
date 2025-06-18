@@ -31,7 +31,7 @@
             font-size: 20px;
         }
 
-        #navbar button {
+        #logout {
             background-color: #e74c3c;
             color: white;
             border: none;
@@ -41,7 +41,20 @@
             font-weight: bold;
         }
 
-        #navbar button:hover {
+        #logout:hover {
+            opacity: 0.9;
+        }
+
+        #profile {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #profile:hover {
             opacity: 0.9;
         }
 
@@ -122,15 +135,28 @@
 </head>
 
 <body>
-    <div id="navbar">
+    <!-- <div id="navbar">
         <h1 id="welcomeMessage"></h1>
         <button onclick="logout()">Logout</button>
+    </div> -->
+
+    <div id="navbar">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <img id="navPic" src="" style="width: 40px; height: 40px; border-radius: 50%;" />
+            <h1 id="welcomeMessage"></h1>
+        </div>
+        <div>
+            <!-- <a href="profile.html" style="margin-right: 10px;">Profile</a> -->
+            <button onclick="profile()" id="profile">Profile</button>
+            <button onclick="logout(event)" id="logout">Logout</button>
+        </div>
     </div>
+
 
     <div class="container">
         <div class="blog-form">
-            <input type="file" id="imageInput" accept="image/*"/>
-            <input type="text" id="titleInput" placeholder="Enter Title"/>
+            <input type="file" id="imageInput" accept="image/*" />
+            <input type="text" id="titleInput" placeholder="Enter Title" />
             <textarea id="descriptionInput" rows="4" placeholder="Enter Description"></textarea>
             <button onclick="submitPost()">Post</button>
         </div>
@@ -142,6 +168,9 @@
 </html>
 
 <script>
+
+
+
     let user = JSON.parse(localStorage.getItem('currentUser'));
     if (!user) {
         window.location.href = "signin.html";
@@ -205,7 +234,7 @@
             saveUserBlogs(blogs)
             renderBlogs()
 
-           
+
             imageInput.value = ''
             document.getElementById('titleInput').value = ''
             document.getElementById('descriptionInput').value = ''
@@ -220,10 +249,30 @@
         renderBlogs()
     }
 
-    function logout() {
+    function logout(ev) {
+        setLoading(true, ev)
+        setTimeout(() => {
         localStorage.removeItem('currentUser')
         window.location.href = "signin.html"
+         setLoading(false, ev)
+        }, 2000)
+    }
+    function setLoading(isLoading, ev) {
+        logout.disabled = isLoading
+        ev.target.innerHTML = isLoading ? 'Logging out' : 'Logout'
+        
+    }
+
+    function profile() {
+        window.location.href = "profile.html"
     }
 
     window.onload = renderBlogs
+
+
+    
+    let profileKey = `profilePic${user.name}`
+    let navPic = document.getElementById('navPic')
+    let pic = localStorage.getItem(profileKey)
+    navPic.src = pic
 </script>

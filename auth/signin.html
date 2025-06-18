@@ -60,13 +60,13 @@
                             <form id="stripe-login">
                                 <div class="field padding-bottom--24">
                                     <label for="username"> Username </label>
-                                    <input type="username" name="username" id="username">
+                                    <input type="username" name="username" id="username" required>
                                 </div>
 
 
                                 <div class="field padding-bottom--24">
                                     <label for="email">Email</label>
-                                    <input type="email" name="email" id="email">
+                                    <input type="email" name="email" id="email" required>
                                 </div>
                                 <div class="field padding-bottom--24">
                                     <div class="grid--50-50">
@@ -75,14 +75,14 @@
                       <a href="#">Forgot your password?</a>
                     </div> -->
                                     </div>
-                                    <input type="password" name="password" id="password">
+                                    <input type="password" name="password" id="password" required>
                                 </div>
 
                                 <div class="field padding-bottom--24">
                                     <div class="grid--50-50">
                                         <label for="confirm"> Confirm Password</label>
                                     </div>
-                                    <input type="password" name="confirmpassword" id="confirmpassword">
+                                    <input type="password" name="confirmpassword" id="confirmpassword" required>
                                 </div>
                                 <div class="field field-checkbox padding-bottom--24 flex-flex align-center">
                                     <label for="checkbox">
@@ -90,7 +90,7 @@
                                     </label>
                                 </div>
                                 <div class="field padding-bottom--24">
-                                    <input type="submit" name="submit" onclick="runLogin(event)" value="Continue">
+                                    <input type="submit" name="submit" onclick="runLogin(event)" value="Continue" id="myButton">
                                 </div>
                                 <div class="field">
                                     <a class="ssolink" href="#">Use single sign-on (Google) instead</a>
@@ -115,6 +115,10 @@
 </html>
 <script>
     function runLogin(e) {
+
+        setLoading(true)
+        setTimeout(() => {
+
         let myPassword = password.value.trim()
         let myConfirmPassword = confirmpassword.value.trim()
         let myUsername = username.value.trim()
@@ -140,6 +144,19 @@
                 window.location.href = "dashboard.html";
             }
         }
+
+              setLoading(false)
+        }, 2000)
+
+    //     function setLoading(isLoading) {
+    //     myButton.disabled = isLoading
+    //     myButton.value = isLoading ? 'Signing in' : 'Continue'
+    // }
+    }
+
+     function setLoading(isLoading) {
+        myButton.disabled = isLoading
+        myButton.value = isLoading ? 'Signing in' : 'Continue'
     }
 
 </script>

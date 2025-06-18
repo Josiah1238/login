@@ -97,7 +97,7 @@
                                 </div>
 
                                 <div class="field padding-bottom--24">
-                                    <input type="submit" name="submit" onclick="runSignUp(event)" value="Continue">
+                                    <input type="submit" name="submit" onclick="runSignUp(event)" value="Continue" id="myButton">
                                 </div>
                                 <div class="field">
                                     <a class="ssolink" href="signin.html">sign-in instead</a>
@@ -148,6 +148,10 @@
 
 
     function runSignUp(e) {
+
+        setLoading(true)
+        setTimeout(() => {
+
         let myPassword = password.value.trim()
         let myConfirmPassword = confirmpassword.value.trim()
         let myUsername = username.value.trim()
@@ -176,14 +180,25 @@
             localStorage.setItem('usersDatabase', JSON.stringify(database))
             console.log(database);
             display()
-            alert('signup successful');
+            alert('signup successful, login to your account');
+            window.location.href = "signin.html"
 
 
 
         }
 
 
+        setLoading(false)
+        }, 2000)
+
+
     }
+
+    function setLoading(isLoading) {
+        myButton.disabled = isLoading
+        myButton.value = isLoading ? 'Signing up' : 'Continue'
+    }
+
 
 
     function display() {
